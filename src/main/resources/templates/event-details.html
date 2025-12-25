@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${event.title} + ' - Cross Culture Canvas'">Event Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">Cross Culture Canvas</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/artists">Artists</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/venues">Venues</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/events">Events</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAnonymous()">
+                    <a class="nav-link" href="/login">Login</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAnonymous()">
+                    <a class="nav-link" href="/register">Register</a>
+                </li>
+                <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                        <span sec:authentication="name">User</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                                                <li>
+                            <a class="dropdown-item" href="/dashboard">
+                                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                            </a>
+                        </li>
+<li sec:authorize="hasRole('ARTIST')">
+    <a class="dropdown-item" href="/artists/profile">My Profile</a>
+    <a class="dropdown-item" href="/media/my-media">My Media</a>
+    <a class="dropdown-item" href="/bookings/my-bookings">My Bookings</a>
+</li>
+<li sec:authorize="hasRole('VENUE_OWNER')">
+    <a class="dropdown-item" href="/venues/my-venues">My Venues</a>
+    <a class="dropdown-item" href="/bookings/venue-bookings">Venue Bookings</a>
+</li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post">
+                                <button type="submit" class="dropdown-item">Logout</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+    <!-- Event Header -->
+    <section class="py-5 bg-dark text-white">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 th:text="${event.title}">Event Title</h1>
+                    <p class="lead">
+                        <i class="fas fa-calendar"></i> 
+                        <span th:text="${#temporals.format(event.eventDate, 'EEEE, MMMM dd, yyyy')}">Date</span> at 
+                        <span th:text="${#temporals.format(event.startTime, 'hh:mm a')}">Time</span>
+                    </p>
+                    <p class="lead">
+                        <i class="fas fa-map-marker-alt"></i> 
+                        <span th:text="${event.venue.name + ', ' + event.venue.city}">Venue</span>
+                    </p>
+                    <p th:text="${event.description}">Event description</p>
+                </div>
+                <div class="col-md-4 text-end" sec:authorize="hasAnyRole('ARTIST', 'VENUE_OWNER')" 
+                     th:if="${(#authentication.name == event.venue.owner.username) || 
+                              (event.artists != null && event.artists.?[username == #authentication.name].size() > 0)}">
+                    <a th:href="@{'/events/edit/' + ${event.id}}" class="btn btn-primary me-2">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a th:href="@{'/events/delete/' + ${event.id}}" class="btn btn-danger"
+                       onclick="return confirm('Are you sure you want to delete this event?')">
+                        <i class="fas fa-trash"></i> Delete
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Event Details -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    <!-- Event Poster -->
+                    <div class="card bg-dark text-white mb-4">
+                        <div class="card-header">
+                            <h5>Event Poster</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <img th:src="${event.posterImage != null and !event.posterImage.isEmpty() ? event.posterImage : '/images/default-event.jpg'}"
+     class="card-img-top" alt="Event">
+                        </div>
+                    </div>
+                    
+                    <!-- Event Information -->
+                    <div class="card bg-dark text-white mb-4">
+                        <div class="card-header">
+                            <h5>Event Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <h6><i class="fas fa-calendar"></i> Date</h6>
+                                    <p th:text="${#temporals.format(event.eventDate, 'MMMM dd, yyyy')}">Date</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <h6><i class="fas fa-clock"></i> Time</h6>
+                                    <p th:text="${#temporals.format(event.startTime, 'hh:mm a') + ' - ' + #temporals.format(event.endTime, 'hh:mm a')}">Time</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <h6><i class="fas fa-map-marker-alt"></i> Venue</h6>
+                                    <p>
+                                        <a th:href="@{'/venues/' + ${event.venue.id}}" th:text="${event.venue.name}">Venue</a>
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <h6><i class="fas fa-info-circle"></i> Status</h6>
+                                    <p>
+                                        <span class="badge" 
+                                              th:classappend="${event.status == T(com.crossculture.canvas.model.Event.EventStatus).UPCOMING ? 'bg-primary' : 
+                                                              (event.status == T(com.crossculture.canvas.model.Event.EventStatus).ONGOING ? 'bg-success' : 
+                                                              (event.status == T(com.crossculture.canvas.model.Event.EventStatus).COMPLETED ? 'bg-secondary' : 'bg-danger'))}"
+                                              th:text="${event.status}">Status</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Event Description -->
+                    <div class="card bg-dark text-white mb-4">
+                        <div class="card-header">
+                            <h5>About This Event</h5>
+                        </div>
+                        <div class="card-body">
+                            <p th:text="${event.description}">Event description</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Performing Artists -->
+                    <div class="card bg-dark text-white">
+                        <div class="card-header">
+                            <h5>Performing Artists</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row" th:if="${event.artists != null && !event.artists.isEmpty()}">
+                                <div class="col-md-4 mb-3" th:each="artist : ${event.artists}">
+                                    <div class="card bg-secondary">
+                                        <div class="card-body text-center">
+                                            <img src="https://via.placeholder.com/100" class="rounded-circle mb-2" alt="Artist">
+                                            <h6 th:text="${artist.username}">Artist Name</h6>
+                                            <a th:href="@{'/artists/profile?userId=' + ${artist.id}}" class="btn btn-sm btn-outline-light">View Profile</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p th:if="${event.artists == null || event.artists.isEmpty()}">No artists announced yet.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <!-- Ticket Information -->
+                    <div class="card bg-dark text-white mb-4">
+                        <div class="card-header">
+                            <h5>Ticket Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <p th:text="${event.ticketInfo != null ? event.ticketInfo : 'Ticket information not available yet.'}">Ticket info</p>
+                            <button class="btn btn-primary w-100" sec:authorize="isAnonymous()">
+                                <i class="fas fa-ticket-alt"></i> Get Tickets
+                            </button>
+                            <button class="btn btn-primary w-100" sec:authorize="isAuthenticated()">
+                                <i class="fas fa-ticket-alt"></i> RSVP
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Venue Information -->
+                    <div class="card bg-dark text-white mb-4">
+                        <div class="card-header">
+                            <h5>Venue Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <h6 th:text="${event.venue.name}">Venue Name</h6>
+                            <p>
+                                <i class="fas fa-map-marker-alt"></i> 
+                                <span th:text="${event.venue.address + ', ' + event.venue.city}">Address</span>
+                            </p>
+                            <p>
+                                <i class="fas fa-phone"></i> 
+                                <span th:text="${event.venue.contactPhone}">Phone</span>
+                            </p>
+                            <a th:href="@{'/venues/' + ${event.venue.id}}" class="btn btn-outline-primary w-100">View Venue</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Share Event -->
+                    <div class="card bg-dark text-white">
+                        <div class="card-header">
+                            <h5>Share This Event</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-around">
+                                <a href="#" class="text-white"><i class="fab fa-facebook fa-2x"></i></a>
+                                <a href="#" class="text-white"><i class="fab fa-twitter fa-2x"></i></a>
+                                <a href="#" class="text-white"><i class="fab fa-instagram fa-2x"></i></a>
+                                <a href="#" class="text-white"><i class="fas fa-link fa-2x"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-3">
+        <p>&copy; 2025 Cross Culture Canvas. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

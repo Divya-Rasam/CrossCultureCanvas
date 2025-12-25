@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${artist.artistName} + ' - Cross Culture Canvas'">Artist Profile</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" th:href="@{/css/style.css}">
+</head>                                             
+<body class="bg-light">
+
+<!-- Navbar -->
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<!-- Hero Section -->
+<section class="py-5 bg-white border-bottom">
+  <div class="container">
+    <div class="row align-items-center g-4">
+      <div class="col-md-3 text-center">
+<img th:src="${artist.profileImage != null and !artist.profileImage.isEmpty() ? artist.profileImage : '/images/default-artist.jpg'}"
+     class="card-img-top" alt="Artist">
+      </div>
+      <div class="col-md-6">
+        <h1 class="fw-bold" th:text="${artist.artistName}">Artist Name</h1>
+        <span class="badge bg-primary mb-2" th:text="${artist.category}">Category</span>
+        <p class="text-muted" th:text="${artist.bio}">Bio</p>
+        <div class="social-links">
+          <a th:if="${artist.instagramUrl}" th:href="${artist.instagramUrl}" target="_blank" class="me-3 text-primary">
+            <i class="fab fa-instagram fa-lg"></i>
+          </a>
+          <a th:if="${artist.youtubeUrl}" th:href="${artist.youtubeUrl}" target="_blank" class="me-3 text-primary">
+            <i class="fab fa-youtube fa-lg"></i>
+          </a>
+          <a th:if="${artist.soundcloudUrl}" th:href="${artist.soundcloudUrl}" target="_blank" class="text-primary">
+            <i class="fab fa-soundcloud fa-lg"></i>
+          </a>
+        </div>
+      </div>
+      <div class="col-md-3 text-md-end" sec:authorize="hasRole('ARTIST')"
+           th:if="${#authentication.name == artist.user.username}">
+        <a th:href="@{'/artists/edit/' + ${artist.id}}" class="btn btn-outline-primary">
+          <i class="fas fa-edit me-2"></i>Edit Profile
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Media Gallery -->
+<section class="py-5">
+  <div class="container">
+    <h2 class="mb-4">Media Gallery</h2>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4" id="mediaTabs" role="tablist">
+      <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#all">All</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#images">Images</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#videos">Videos</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#audio">Audio</button></li>
+    </ul>
+
+    <!-- Content -->
+    <div class="tab-content" id="mediaTabsContent">
+      <div class="tab-pane fade show active" id="all">
+        <div class="row g-4">
+  <div class="col-md-4 fade-in" th:each="media : ${mediaList}">
+    <div class="card border-0 shadow-sm h-100">
+      <!-- Image -->
+      <div th:if="${media.type == T(com.crossculture.canvas.model.Media.MediaType).IMAGE}">
+        <img th:src="${media.url}" class="card-img-top" alt="Media">
+      </div>
+      <!-- Video Thumbnail -->
+      <div th:if="${media.type == T(com.crossculture.canvas.model.Media.MediaType).VIDEO}">
+        <img th:src="${media.thumbnailUrl != null ? media.thumbnailUrl : 'https://via.placeholder.com/400x300'}"
+             class="card-img-top" alt="Video">
+      </div>
+      <!-- Audio Visualizer -->
+      <div th:if="${media.type == T(com.crossculture.canvas.model.Media.MediaType).AUDIO}" class="d-flex align-items-end justify-content-center bg-light" style="height:200px;">
+        <div class="audio-visualizer mb-3">
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <h6 class="fw-bold" th:text="${media.title}">Title</h6>
+        <small class="text-muted" th:text="${media.description}">Description</small>
+      </div>
+    </div>
+  </div>
+</div>
+      </div>
+      <!-- Repeat panes for images, videos, audio -->
+      <div class="tab-pane fade" id="images"><p class="text-muted">Images coming soon.</p></div>
+      <div class="tab-pane fade" id="videos"><p class="text-muted">Videos coming soon.</p></div>
+      <div class="tab-pane fade" id="audio"><p class="text-muted">Audio coming soon.</p></div>
+    </div>
+
+    <!-- Add Media Button -->
+    <div class="text-center mt-4" sec:authorize="hasRole('ARTIST')"
+         th:if="${#authentication.name == artist.user.username}">
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMediaModal">
+        <i class="fas fa-plus me-2"></i>Add Media
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Upcoming Events -->
+<section class="py-5 bg-white border-top">
+  <div class="container">
+    <h2 class="mb-4">Upcoming Events</h2>
+    <div class="row g-4">
+      <div class="col-md-4 fade-in">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <h6 class="fw-bold">Underground Hip Hop Night</h6>
+            <small class="text-muted"><i class="fas fa-calendar me-1"></i>Dec 15, 2023</small><br>
+            <small class="text-muted"><i class="fas fa-map-marker-alt me-1"></i>The Basement Venue</small><br>
+            <a href="#" class="btn btn-sm btn-outline-primary mt-2">View Details</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 fade-in">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <h6 class="fw-bold">Street Art Exhibition</h6>
+            <small class="text-muted"><i class="fas fa-calendar me-1"></i>Jan 5, 2024</small><br>
+            <small class="text-muted"><i class="fas fa-map-marker-alt me-1"></i>Urban Gallery</small><br>
+            <a href="#" class="btn btn-sm btn-outline-primary mt-2">View Details</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 fade-in">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <h6 class="fw-bold">Skate Competition</h6>
+            <small class="text-muted"><i class="fas fa-calendar me-1"></i>Jan 20, 2024</small><br>
+            <small class="text-muted"><i class="fas fa-map-marker-alt me-1"></i>Skate Park Downtown</small><br>
+            <a href="#" class="btn btn-sm btn-outline-primary mt-2">View Details</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Add Media Modal -->
+<div class="modal fade" id="addMediaModal" tabindex="-1" aria-labelledby="addMediaModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Media</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+        <div class="modal-body">
+          <form th:action="@{/media/save}" method="post" th:object="${media}">
+            <input type="hidden" th:field="*{id}" />
+            <input type="hidden" th:field="*{artist}" />
+
+            <div class="mb-3">
+              <label class="form-label">Title</label>
+              <input type="text" class="form-control" th:field="*{title}" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Description</label>
+              <textarea class="form-control" rows="3" th:field="*{description}"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Media Type</label>
+              <select class="form-select" th:field="*{type}" required>
+                <option value="">Select type</option>
+                <option th:each="type : ${T(com.crossculture.canvas.model.Media.MediaType).values()}"
+                        th:value="${type}" th:text="${type}">Type</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">URL</label>
+              <input type="url" class="form-control" th:field="*{url}" required>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-primary">Upload Media</button>
+            </div>
+          </form>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/components.js}"></script>
+</body>
+</html>

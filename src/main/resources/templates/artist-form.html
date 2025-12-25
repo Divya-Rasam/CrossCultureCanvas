@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Artist Profile - Cross Culture Canvas</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="bg-light">
+
+<!-- Navbar -->
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<!-- Artist Form -->
+<section class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm border-0">
+          <div class="card-body p-4">
+            <h3 class="mb-4 text-center">Create Your Artist Profile</h3>
+            <form th:action="@{/artists/save}" method="post" th:object="${artist}" enctype="multipart/form-data" novalidate>
+
+              <!-- Artist Name -->
+              <div class="mb-3">
+                <label for="artistName" class="form-label">Artist Name</label>
+                <input type="text" class="form-control" id="artistName" th:field="*{artistName}" required>
+              </div>
+
+              <!-- Category -->
+              <div class="mb-3">
+                <label for="category" class="form-label">Category</label>
+                <select class="form-select" id="category" th:field="*{category}" required>
+                  <option value="">Select category</option>
+                  <option th:each="cat : ${T(com.crossculture.canvas.model.ArtistCategory).values()}"
+                          th:value="${cat}" th:text="${cat}"></option>
+                </select>
+              </div>
+
+              <!-- Bio -->
+              <div class="mb-3">
+                <label for="bio" class="form-label">Bio</label>
+                <textarea class="form-control" id="bio" rows="4" th:field="*{bio}" required></textarea>
+              </div>
+
+
+                <!-- Social URLs -->
+            <div class="mb-3">
+              <label class="form-label">Social Links <small class="text-muted">(at least one)</small></label>
+              <input type="url" class="form-control mb-2" placeholder="Instagram URL" th:field="*{instagramUrl}">
+              <input type="url" class="form-control mb-2" placeholder="YouTube URL" th:field="*{youtubeUrl}">
+              <input type="url" class="form-control" placeholder="SoundCloud URL" th:field="*{soundcloudUrl}">
+              <div class="form-text">Provide at least one social link.</div>
+            </div>
+
+            <!-- Social validation error -->
+            <div th:if="${#fields.hasErrors('socialValid')}" class="alert alert-warning">
+              <span th:errors="*{socialValid}">At least one social link is required.</span>
+            </div>
+              
+
+              <!-- Submit -->
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Create Profile</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
