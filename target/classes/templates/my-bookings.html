@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Bookings - Cross Culture Canvas</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body class="bg-dark text-white">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<section class="py-5 bg-dark text-white">
+  <div class="container">
+    <h1>My Bookings</h1>
+    <p class="lead">Manage your venue booking requests</p>
+  </div>
+</section>
+
+<section class="py-5">
+  <div class="container">
+    <div th:if="${#lists.isEmpty(bookings)}" class="text-center py-5">
+      <i class="fas fa-calendar-times fa-3x mb-3"></i>
+      <h3>You don't have any bookings yet</h3>
+      <p class="lead">Browse venues and submit booking requests</p>
+      <a href="/venues" class="btn btn-primary">Browse Venues</a>
+    </div>
+
+    <div th:if="${!#lists.isEmpty(bookings)}" class="table-responsive">
+      <table class="table table-dark table-striped align-middle">
+        <thead>
+          <tr>
+            <th>Venue</th>
+            <th>Event Title</th>
+            <th>Date & Time</th>
+            <th>Status</th>
+            <th>Payment</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="booking : ${bookings}">
+            <td><a th:href="@{'/venues/' + ${booking.venue.id}}" th:text="${booking.venue.name}">Venue</a></td>
+            <td th:text="${booking.eventTitle}">Event Title</td>
+            <td>
+              <div th:text="${#temporals.format(booking.eventDate, 'MMM dd, yyyy')}">Date</div>
+              <small th:text="${#temporals.format(booking.startTime, 'hh:mm a') + ' - ' + #temporals.format(booking.endTime, 'hh:mm a')}">Time</small>
+            </td>
+            <td>
+              <span class="badge"
+                    th:classappend="${booking.status == T(com.crossculture.canvas.model.Booking.BookingStatus).PENDING ? 'bg-warning text-dark' :
+                                    (booking.status == T(com.crossculture.canvas.model.Booking.BookingStatus).APPROVED ? 'bg-success' :
+                                    (booking.status == T(com.crossculture.canvas.model.Booking.BookingStatus).REJECTED ? 'bg-danger' : 'bg-secondary'))}"
+                    th:text="${booking.status}">Status</span>
+            </td>
+            <!-- ****  PAYMENT CELL  **** -->
+            <td>
+              <span th:if="${booking.status == T(com.crossculture.canvas.model.Booking.BookingStatus).APPROVED and booking.payment == null}">
+                <form th:action="@{/payments/pay/{bookingId}/{amt}(bookingId=${booking.id},amt=${booking.venue.bookingPrice.longValue() * 100})}"
+      method="get">
+    <button type="submit" class="btn btn-sm btn-success">
+        Pay ₹ <span th:text="${#numbers.formatDecimal(booking.venue.bookingPrice,0,'COMMA',0,'POINT')}"></span>
+    </button>
+</form>
+              </span>
+              <span th:if="${booking.payment != null and booking.payment.status == T(com.crossculture.canvas.model.Payment.Status).PAID}">
+                <span class="badge bg-success">Paid</span>
+              </span>
+              <span th:if="${booking.status != T(com.crossculture.canvas.model.Booking.BookingStatus).APPROVED or booking.payment == null}">—</span>
+            </td>
+            <!-- ****  /PAYMENT CELL  **** -->
+            <!-- ✅  REPLACEMENT PAY CELL  -->
+<td>
+  <!-- Only show pay button for APPROVED bookings that are not already paid -->
+  <span th:if="${booking.status == T(com.crossculture.canvas.model.Booking.BookingStatus).APPROVED and booking.payment == null}">
+      <a th:href="@{/payments/pay/{id}/{amt}(id=${booking.id},amt=${booking.venue.bookingPrice.longValue() * 100})}"
+         class="btn btn-sm btn-success">
+         Pay ₹ <span th:text="${#numbers.formatDecimal(booking.venue.bookingPrice,0,'COMMA',0,'POINT')}"></span>
+      </a>
+  </span>
+
+  <!-- Already paid -->
+  <span th:if="${booking.payment != null and booking.payment.status == T(com.crossculture.canvas.model.Payment.Status).PAID}">
+      <span class="badge bg-success">Paid</span>
+  </span>
+
+  <!-- Other statuses -->
+  <span th:if="${booking.status != T(com.crossculture.canvas.model.Booking.BookingStatus).APPROVED or booking.payment == null}">—</span>
+</td>
+<!-- ✅  END REPLACEMENT  -->
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

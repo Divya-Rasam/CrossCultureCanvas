@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - Cross Culture Canvas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<section class="py-5 bg-dark text-white">
+  <div class="container">
+    <h1>Search Results</h1>
+    <p class="lead">Results for: <strong th:text="${query}"></strong></p>
+
+    <form method="get" class="row g-3 mb-4">
+      <input type="hidden" name="query" th:value="${query}">
+      <div class="col-md-3">
+        <select name="type" class="form-select">
+          <option value="all" th:selected="${type == 'all'}">All</option>
+          <option value="artists" th:selected="${type == 'artists'}">Artists</option>
+          <option value="venues" th:selected="${type == 'venues'}">Venues</option>
+          <option value="events" th:selected="${type == 'events'}">Events</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <input type="text" name="city" class="form-control" placeholder="City" th:value="${city}">
+      </div>
+      <div class="col-md-3">
+        <input type="date" name="date" class="form-control" th:value="${date}">
+      </div>
+      <div class="col-md-3">
+        <button type="submit" class="btn btn-primary w-100">Filter</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<section class="py-5">
+  <div class="container">
+    <!-- Artists -->
+    <div th:if="${artists}" class="mb-5">
+      <h3>Artists</h3>
+      <div class="row g-4">
+        <div class="col-md-3" th:each="artist : ${artists}">
+          <div class="card artist-card fade-in">
+            <img th:src="${artist.profileImage}" class="card-img-top" alt="Artist">
+            <div class="card-body">
+              <h6 th:text="${artist.artistName}">Name</h6>
+              <span class="badge bg-primary" th:text="${artist.category}">Category</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination for Artists -->
+      <nav th:if="${artists.totalPages > 1}">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" th:classappend="${artists.first} ? 'disabled'">
+            <a class="page-link" th:href="@{/search(query=${query},type=${type},city=${city},date=${date},page=${artists.number - 1})}">Prev</a>
+          </li>
+          <li class="page-item" th:classappend="${artists.last} ? 'disabled'">
+            <a class="page-link" th:href="@{/search(query=${query},type=${type},city=${city},date=${date},page=${artists.number + 1})}">Next</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Venues -->
+    <div th:if="${venues}" class="mb-5">
+      <h3>Venues</h3>
+      <div class="row g-4">
+        <div class="col-md-3" th:each="venue : ${venues}">
+          <div class="card venue-card fade-in">
+            <img src="https://via.placeholder.com/400x300" class="card-img-top" alt="Venue">
+            <div class="card-body">
+              <h6 th:text="${venue.name}">Venue Name</h6>
+              <small th:text="${venue.city}">City</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination for Venues -->
+      <nav th:if="${venues.totalPages > 1}">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" th:classappend="${venues.first} ? 'disabled'">
+            <a class="page-link" th:href="@{/search(query=${query},type=${type},city=${city},date=${date},page=${venues.number - 1})}">Prev</a>
+          </li>
+          <li class="page-item" th:classappend="${venues.last} ? 'disabled'">
+            <a class="page-link" th:href="@{/search(query=${query},type=${type},city=${city},date=${date},page=${venues.number + 1})}">Next</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Events -->
+    <div th:if="${events}" class="mb-5">
+      <h3>Events</h3>
+      <div class="row g-4">
+        <div class="col-md-3" th:each="event : ${events}">
+          <div class="card event-card fade-in">
+            <img src="https://via.placeholder.com/400x300" class="card-img-top" alt="Event">
+            <div class="card-body">
+              <h6 th:text="${event.title}">Event Title</h6>
+              <small th:text="${#temporals.format(event.eventDate, 'MMM dd')}">Date</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination for Events -->
+      <nav th:if="${events.totalPages > 1}">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" th:classappend="${events.first} ? 'disabled'">
+            <a class="page-link" th:href="@{/search(query=${query},type=${type},city=${city},date=${date},page=${events.number - 1})}">Prev</a>
+          </li>
+          <li class="page-item" th:classappend="${events.last} ? 'disabled'">
+            <a class="page-link" th:href="@{/search(query=${query},type=${type},city=${city},date=${date},page=${events.number + 1})}">Next</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- No Results -->
+    <div th:if="${#lists.isEmpty(artists) and #lists.isEmpty(venues) and #lists.isEmpty(events)}" class="text-center">
+      <i class="fas fa-search fa-3x mb-3 text-muted"></i>
+      <h4>No results found</h4>
+      <p class="text-muted">Try a different keyword or filter</p>
+    </div>
+  </div>
+</section>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+
+
+<style>
+/* DEBUG – delete after fix */
+.card {
+  background: #ffffff !important;
+  color: #222222 !important;
+  border: 1px solid #cccccc !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,.08) !important;
+}
+.card-body {
+  color: #222222 !important;
+}
+.card-img-top {
+  max-height: 180px;
+  object-fit: cover;
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

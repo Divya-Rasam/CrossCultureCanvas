@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venues - Cross Culture Canvas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">Cross Culture Canvas</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/artists">Artists</a></li>
+                <li class="nav-item"><a class="nav-link" href="/venues">Venues</a></li>
+                <li class="nav-item"><a class="nav-link" href="/events">Events</a></li>
+                <li class="nav-item" sec:authorize="isAnonymous()"><a class="nav-link" href="/login">Login</a></li>
+                <li class="nav-item" sec:authorize="isAnonymous()"><a class="nav-link" href="/register">Register</a></li>
+                <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                        <span sec:authentication="name">User</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/dashboard"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+                        <li sec:authorize="hasRole('ARTIST')">
+                            <a class="dropdown-item" href="/artists/profile">My Profile</a>
+                            <a class="dropdown-item" href="/media/my-media">My Media</a>
+                            <a class="dropdown-item" href="/bookings/my-bookings">My Bookings</a>
+                        </li>
+                        <li sec:authorize="hasRole('VENUE_OWNER')">
+                            <a class="dropdown-item" href="/venues/my-venues">My Venues</a>
+                            <a class="dropdown-item" href="/bookings/venue-bookings">Venue Bookings</a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post">
+                                <button type="submit" class="dropdown-item">Logout</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Venues Header -->
+<section class="py-5 bg-dark text-white">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <h1>Performance Venues</h1>
+                <p class="lead">Discover spaces for underground artists to perform and exhibit</p>
+            </div>
+            <div class="col-md-4 text-end" sec:authorize="hasRole('VENUE_OWNER')">
+                <a th:href="@{/venues/new}" class="btn btn-primary"><i class="fas fa-plus"></i> Add Venue</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Search and Filter -->
+<section class="py-3 bg-secondary">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search venues...">
+                    <button class="btn btn-primary" type="button"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex justify-content-end">
+                    <select class="form-select w-auto me-2">
+                        <option>All Cities</option>
+                        <option>New York</option>
+                        <option>Los Angeles</option>
+                        <option>Chicago</option>
+                    </select>
+                    <select class="form-select w-auto">
+                        <option>All States</option>
+                        <option>NY</option>
+                        <option>CA</option>
+                        <option>IL</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Venues Grid -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4" th:each="venue : ${venues}">
+                <div class="card venue-card">
+                    <img th:src="${venue.profileImage != null and !venue.profileImage.isEmpty() ? venue.profileImage : '/images/default-venue.jpg'}"
+                         class="card-img-top" alt="Venue">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${venue.name}">Venue Name</h5>
+                        <p class="card-text">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span th:text="${venue.city + ', ' + venue.state}">City, State</span>
+                        </p>
+                        <p class="card-text" th:text="${#strings.abbreviate(venue.description, 100)}">Venue description</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="badge bg-primary" th:text="${venue.capacity + ' capacity'}">Capacity</span>
+                               <span class="badge bg-success ms-1" th:text="'₹' + ${venue.hourlyRate} + '/hr'">Rate</span>
+                            </div>
+                            <a th:href="@{'/venues/' + ${venue.id}}" class="btn btn-outline-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="bg-dark text-white text-center py-3">
+    <p>&copy; 2025 Cross Culture Canvas. All rights reserved.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

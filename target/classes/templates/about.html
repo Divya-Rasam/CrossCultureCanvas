@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About - Cross Culture Canvas</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <style>
+    .about-hero {
+      background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/images/about/hero.jpg') center/cover no-repeat;
+      color: white;
+      padding: 6rem 0;
+    }
+    .about-icon {
+      font-size: 2.5rem;
+      color: #6c63ff;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<!-- Hero -->
+<section class="about-hero text-center">
+  <div class="container">
+    <h1 class="display-5 fw-bold">About Cross Culture Canvas</h1>
+    <p class="lead">A platform built to amplify underground artists and connect them with venues & event organizers.</p>
+  </div>
+</section>
+
+<!-- What We Do -->
+<section class="py-5">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <h2 class="fw-bold mb-3">What We Do</h2>
+        <p>We bridge the gap between underground talent and real-world opportunities. Whether you're a rapper, graffiti artist, DJ, or skateboarder, we give you the tools to showcase your work, connect with venues, and get booked.</p>
+        <p>For venue owners and event organizers, we make it easy to discover, book, and promote authentic underground talent.</p>
+      </div>
+      <div class="col-md-6">
+        <img src="/images/about/artist.jpg" class="img-fluid rounded shadow" alt="Artist at work">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Who It's For -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <h2 class="text-center fw-bold mb-5">Who It's For</h2>
+    <div class="row g-4 text-center">
+      <div class="col-md-4">
+        <div class="about-icon"><i class="fas fa-microphone-alt"></i></div>
+        <h5>Artists</h5>
+        <p>Create your profile, upload media, and get booked for gigs, exhibitions, and showcases.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="about-icon"><i class="fas fa-building"></i></div>
+        <h5>Venue Owners</h5>
+        <p>List your space, manage bookings, and discover talented artists ready to perform.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="about-icon"><i class="fas fa-calendar-alt"></i></div>
+        <h5>Event Organizers</h5>
+        <p>Browse artists and venues, create events, and manage everything in one place.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section class="py-5">
+  <div class="container">
+    <h2 class="text-center fw-bold mb-5">How It Works</h2>
+    <div class="row g-4">
+      <div class="col-md-4 text-center">
+        <div class="mb-3"><span class="badge bg-primary fs-5">1</span></div>
+        <h5>Create Your Profile</h5>
+        <p>Artists upload media. Venues list their space. Organizers plan events.</p>
+      </div>
+      <div class="col-md-4 text-center">
+        <div class="mb-3"><span class="badge bg-primary fs-5">2</span></div>
+        <h5>Connect & Book</h5>
+        <p>Artists apply to venues. Venue owners approve bookings. Everyone gets notified.</p>
+      </div>
+      <div class="col-md-4 text-center">
+        <div class="mb-3"><span class="badge bg-primary fs-5">3</span></div>
+        <h5>Host & Perform</h5>
+        <p>Events go live. Artists perform. The underground scene grows.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-5 bg-dark text-white text-center">
+  <div class="container">
+    <h3 class="fw-bold mb-3">Ready to Join the Movement?</h3>
+    <p class="mb-4">Whether you're here to create, host, or discover — your next opportunity starts now.</p>
+    <a href="/register" class="btn btn-primary btn-lg">Get Started</a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
