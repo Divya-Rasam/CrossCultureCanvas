@@ -64,10 +64,11 @@ public class DataInitializer {
             Artist beatBender = createArtistIfNotExists(dj2, "Beat Bender", "Twisting sounds", ArtistCategory.DJ, null, "https://youtube.com/beatbender", null, "https://via.placeholder.com/400x300?text=Beat+Bender");
 
             // === VENUES ===
-            Venue v1 = createVenueIfNotExists(owner1, "Palava Ground", "Outdoor amphitheatre for 500+ crowd", "Palava Ave, Mumbai", "Mumbai", "MH", "400001", 600, 100.0, "PA System, Lights, Parking", "owner@palava.com", "+912233445566", "https://palavaground.com", "https://via.placeholder.com/400x300?text=Palava+Ground");
-            Venue v2 = createVenueIfNotExists(owner2, "The Basement", "Underground club for 200 people", "Lower Parel, Mumbai", "Mumbai", "MH", "400013", 200, 80.0, "Smoke, Lights, Bar", "basement@palava.com", "+912233445577", "https://basement.club", "https://via.placeholder.com/400x300?text=The+Basement");
-            Venue v3 = createVenueIfNotExists(owner3, "Urban Canvas Gallery", "White-wall gallery for 150 guests", "Bandra, Mumbai", "Mumbai", "MH", "400050", 150, 120.0, "Projector, AC, Security", "urban@palava.com", "+912233445588", "https://urbancanvas.in", "https://via.placeholder.com/400x300?text=Urban+Canvas");
-            Venue v4 = createVenueIfNotExists(owner1, "Rooftop Vibes", "Open-air rooftop for 300 guests", "Andheri, Mumbai", "Mumbai", "MH", "400053", 300, 90.0, "Stage, Lights, Bar, Restrooms", "rooftop@palava.com", "+912233445599", "https://rooftopvibes.in", "https://via.placeholder.com/400x300?text=Rooftop+Vibes");
+            // Added 0.0 for bookingPrice in each call below
+            Venue v1 = createVenueIfNotExists(owner1, "Palava Ground", "Outdoor amphitheatre for 500+ crowd", "Palava Ave, Mumbai", "Mumbai", "MH", "400001", 600, 100.0, 0.0, "PA System, Lights, Parking", "owner@palava.com", "+912233445566", "https://palavaground.com", "https://via.placeholder.com/400x300?text=Palava+Ground");
+            Venue v2 = createVenueIfNotExists(owner2, "The Basement", "Underground club for 200 people", "Lower Parel, Mumbai", "Mumbai", "MH", "400013", 200, 80.0, 0.0, "Smoke, Lights, Bar", "basement@palava.com", "+912233445577", "https://basement.club", "https://via.placeholder.com/400x300?text=The+Basement");
+            Venue v3 = createVenueIfNotExists(owner3, "Urban Canvas Gallery", "White-wall gallery for 150 guests", "Bandra, Mumbai", "Mumbai", "MH", "400050", 150, 120.0, 0.0, "Projector, AC, Security", "urban@palava.com", "+912233445588", "https://urbancanvas.in", "https://via.placeholder.com/400x300?text=Urban+Canvas");
+            Venue v4 = createVenueIfNotExists(owner1, "Rooftop Vibes", "Open-air rooftop for 300 guests", "Andheri, Mumbai", "Mumbai", "MH", "400053", 300, 90.0, 0.0, "Stage, Lights, Bar, Restrooms", "rooftop@palava.com", "+912233445599", "https://rooftopvibes.in", "https://via.placeholder.com/400x300?text=Rooftop+Vibes");
 
             // === EVENTS ===
             Event e1 = createEventIfNotExists("Palava Hip-Hop Night", "Open-mic + headliner MC Flow", v1, LocalDateTime.now().plusDays(7), LocalDateTime.now().plusDays(7).plusHours(19), LocalDateTime.now().plusDays(7).plusHours(23), "₹200 at gate", "https://via.placeholder.com/800x400");
@@ -122,8 +123,8 @@ public class DataInitializer {
     }
 
     private Venue createVenueIfNotExists(User owner, String name, String desc, String addr, String city,
-                                         String state, String zip, Integer cap, Double rate, String amenities,
-                                         String email, String phone, String web, String imageUrl) {
+                                         String state, String zip, Integer cap, Double rate, Double bookingPrice, // Added bookingPrice param
+                                         String amenities, String email, String phone, String web, String imageUrl) {
         if (!venueService.getVenuesByOwner(owner).isEmpty()) {
             return venueService.getVenuesByOwner(owner).get(0);
         }
@@ -137,6 +138,7 @@ public class DataInitializer {
         v.setZipCode(zip);
         v.setCapacity(cap);
         v.setHourlyRate(rate);
+        v.setBookingPrice(bookingPrice); // ADDED THIS LINE
         v.setAmenities(amenities);
         v.setContactEmail(email);
         v.setContactPhone(phone);
